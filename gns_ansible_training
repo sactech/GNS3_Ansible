@@ -1,0 +1,62 @@
+conf t
+username cisco password cisco
+username cisco privilege 15
+line vty 0 4 
+transport input all
+login local
+exit
+ip domain-name jeffy.com
+crypt key gen rsa mod 1024
+
+
+           File: ansible.cfg                                  
+
+[defaults]
+hostfile = ./hosts
+host_key_checking = false
+timeout = 5
+deprecation_warnings=False
+
+
+
+
+root@NetworkAutomation-1:~# ansible --list-hosts all
+  hosts (5):
+    core1
+    core2
+    dsw1
+    dsw2
+    dsw3
+
+
+
+ansible all -m raw -a "show ip int brie | exc una" -u cisco -k
+
+ansible all -m raw -a "show ver" -u cisco -k | grep 'SUCCESS\|Software'
+ansible all -m raw -a "show ver" -u cisco -k | grep 'SUCCESS\|Version'
+
+ansible all -m raw -a "show ip int brie | exc una" -u cisco -k | grep 'SUCCESS\|YES'
+
+
+
+
+ansible all -m raw -a "show ip int brie | exc una" -u cisco -k | grep 'SUCCESS\|YES' > output.txt
+
+
+
+---
+- name: Get ARP information
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: show arp
+      raw: "show arp"
+
+      register: print_output
+
+    - debug: var=print_output.stdout_lines
+
+
+
+ansible-playbook arp_playbook.yml -u cisco -k
