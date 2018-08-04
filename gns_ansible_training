@@ -79,3 +79,25 @@ ansible-playbook arp_playbook.yml -u cisco -k
 
       - debug: var=print_output.stdout_lines
 
+# playbook to show ver and backup all devices output to a file in folder
+
+---
+  - name: Backup show version and other user level commands
+    hosts: all
+    gather_facts: false
+    connection: local
+    
+    tasks:
+      - name: run multiple commands on remote nodes
+        ios_command:
+          commands:
+           - show version
+           - show ip int brief
+           - show ip route 
+        register: print_output
+
+      - debug: var=print_output.stdout_lines
+      
+      - name: save output to a file
+        copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory__hostname }}.txt"
+
