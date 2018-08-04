@@ -101,3 +101,23 @@ ansible-playbook arp_playbook.yml -u cisco -k
       - name: save output to a file
         copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory__hostname }}.txt"
 
+# playbook to send show run commands (using ios_command module and then added the "authorize yes" to allow privledges access, then run backups of the device configs
+
+---
+  - name: Backup show run (enable mode commands
+    hosts: all
+    gather_facts: false
+    connection: local
+    
+    tasks:
+      - name: run enable level commands
+        ios_command:
+          authorize: yes
+          commands:
+           - show run 
+        register: print_output
+
+      - debug: var=print_output.stdout_lines
+      
+      - name: save output to a file
+        copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
